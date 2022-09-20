@@ -1,0 +1,103 @@
+---
+title: "Utførdring2.3"
+author: "Justina Sumskyte"
+date: '2022-09-19'
+output: pdf_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+
+library(readr)
+library(ggplot2)
+library(tidyverse)
+```
+
+
+```{r echo=TRUE}
+union<- read_csv("union_unempl.csv")
+
+union <- union %>%
+  mutate(Excess_coverage = union$coverage - union$density)
+
+mapdata <- map_data("world")
+
+union$country <- gsub("United Kingdom", "UK", union$country)
+
+names(union)[names(union) == "country"] <- "region"
+
+mapdata <- right_join(mapdata, union, by = "region")
+```
+
+
+```{r data-import1, echo=TRUE, fig.height=6, fig.width=6}
+arbeidsledighet <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = unempl), color = "black")+
+  scale_fill_gradient(name = "% arbeidsledighetsrate", low = "mistyrose2", high = "hotpink3")+
+  labs(title="Arbeidsledighetsrate\nEuropa 2019")+
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+  
+arbeidsledighet
+```
+
+
+```{r data-import2, echo=TRUE, fig.height=6, fig.width=6}
+fagforeningsdensitet <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = density), color = "black")+
+  scale_fill_gradient(name = "fagforeningsdensitet", low = "lightblue2", high = "tomato1")+
+  labs(title="Fagforeningsdensitet\nEuropa 2019")+
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+ 
+fagforeningsdensitet
+```
+
+```{r data-import3, echo=TRUE, fig.height=6, fig.width=6}
+Excess_coverage <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = Excess_coverage), color = "black")+
+  scale_fill_gradient(name = "Excess coverage", low = "mintcream", high = "plum", na.value = "seashell1")+
+  labs(title="Excess_coverage\nEuropa")+
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+  
+Excess_coverage
+```
+
+```{r data-import4, echo=TRUE, fig.height=6, fig.width=6}
+
+Koordinering_av_lønnsfastsettelse <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = coord), color = "black")+
+  scale_fill_manual(name = "Koordinering av lønnsfastsettelse", values = c("violet", "purple1", "powderblue", "rosybrown1", "yellow1"))+
+  labs(title="Koordinering av lønnsfastsettelse\nEuropa 2019")+
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+  
+
+Koordinering_av_lønnsfastsettelse
+
+
+```
+

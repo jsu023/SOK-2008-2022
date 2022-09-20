@@ -1,0 +1,94 @@
+---
+title: "Innlevering2"
+author: "Justina Sumskyte"
+date: '2022-09-15'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = FALSE)
+library(readr)
+library(ggplot2)
+library(tidyverse)
+```
+
+
+
+```{r include=FALSE}
+union<- read_csv("union_unempl.csv")
+
+union <- union %>%
+  mutate(Excess_coverage = union$coverage - union$density)
+
+
+mapdata <- map_data("world")
+
+union$country <- gsub("United Kingdom", "UK", union$country)
+
+names(union)[names(union) == "country"] <- "region"
+
+mapdata <- right_join(mapdata, union, by = "region")
+```
+
+
+
+```{r pressure, echo=FALSE}
+arbeidsledighet <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = mean_unempl2015_2019.x), color = "black")+
+  scale_fill_gradient(name = "% arbeidsledighetsrate", low = "mistyrose2", high = "hotpink3")+
+  theme(
+    axis.text.x = element_blank(), 
+    axis.text.y = element_blank(), 
+    axis.ticks = element_blank(), 
+    axis.title.x = element_blank(), 
+    axis.title.y = element_blank()
+  )+
+  theme_void()
+arbeidsledighet
+```
+
+```{r echo=FALSE}
+fagforeningsdensitet <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = density.x), color = "black")+
+  scale_fill_gradient(name = "fagforeningsdensitet", low = "lightblue2", high = "lightseagreen")+
+  theme(
+    axis.text.x = element_blank(), 
+    axis.text.y = element_blank(), 
+    axis.ticks = element_blank(), 
+    axis.title.x = element_blank(), 
+    axis.title.y = element_blank()
+  )+
+  theme_void()
+fagforeningsdensitet
+```
+
+```{r echo=FALSE}
+Excess_coverage <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = density.x), color = "black")+
+  scale_fill_gradient(name = "Excess coverage", low = "mintcream", high = "royalblue2", na.value = "seashell1")+
+  theme(
+    axis.text.x = element_blank(), 
+    axis.text.y = element_blank(), 
+    axis.ticks = element_blank(), 
+    axis.title.x = element_blank(), 
+    axis.title.y = element_blank()
+  )+
+  theme_void()
+Excess_coverage
+```
+
+```{r echo=FALSE}
+Koordinering_av_lønnsfastsettelse <- ggplot(mapdata, aes(x= long , y = lat, group = group))+
+  geom_polygon(aes(fill = coord.x), color = "black")+
+  scale_fill_manual(name = "Koordinering av lønnsfastsettelse", values = c("mediumseagreen", "skyblue3", "lightskyblue3", "honeydew3", "khaki3"))+
+  theme(
+    axis.text.x = element_blank(), 
+    axis.text.y = element_blank(), 
+    axis.ticks = element_blank(), 
+    axis.title.x = element_blank(), 
+    axis.title.y = element_blank()
+  )+
+  theme_void()
+Koordinering_av_lønnsfastsettelse
+```
+
