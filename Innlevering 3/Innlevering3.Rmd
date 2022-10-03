@@ -1,0 +1,149 @@
+---
+title: "Innlevering 3"
+author: "Justina Sumskyte"
+date: '2022-09-27'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(OECD) 
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(ggrepel)
+library(jsonstat)
+library(rjstat)
+library(rjson)
+library(tidyjson)
+library(httr)
+library(janitor)
+```
+
+
+```{r cars, echo=TRUE}
+
+data <- "https://data.ssb.no/api/v0/no/table/11155/"
+
+data_frame <- '{
+  "query": [
+    {
+      "code": "Kjonn",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    {
+      "code": "Alder",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "20-64",
+          "15-24"
+        ]
+      }
+    },
+    {
+      "code": "UtdNivaa",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "TOT"
+        ]
+      }
+    },
+    {
+      "code": "ContentsCode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "ArbLedigProsent"
+        ]
+      }
+    },
+    {
+      "code": "Tid",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2020"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}'
+
+ssb_df <- POST(data, body = data_frame, encode = "json", verbose())
+
+ssb_df <- fromJSONstat(content(ssb_df, "text")) %>%
+  as_tibble()
+
+```
+
+Utfordring 3.1 
+
+```{r pressure, echo=TRUE}
+
+ggplot(ssb_df, aes(år, value, group = alder))+
+  geom_col(position = "identity", aes(fill=alder), alpha =.5)+
+  scale_fill_manual(values = c("lightpink1", "hotpink3"))+
+labs(title = "Arbeidsledighet i %", subtitle  = "blant ungdommer og voksne", x = "År" , y ="Arbeidsledighet i %")+
+  theme(panel.background = element_rect(fill = "white", color = "white"), plot.title = element_text(size = 10), plot.subtitle = element_text(size =8), axis.title = element_text(size = 8))
+
+```
+
+```{r echo=TRUE}
+
+dsets<-get_datasets()
+search_dataset("wage",dsets)
+search_dataset("unemployment",dsets)
+
+minwage <- get_dataset("MIN2AVE",
+                       filter = "USA+CAN+FRA+GBR+DEU+NZL", 
+                       pre_formatted = TRUE)
+
+minwage2019 <- subset(minwage, Time < 2019 & Time >2007 & SERIES=="MEDIAN")
+minwage2007_2019 <- subset(minwage2019, Time>2007)
+
+unempl <- get_dataset("MIG_NUP_RATES_GENDER",
+                      filter = "USA+CAN+FRA+GBR+DEU+NZL", 
+                      pre_formatted = TRUE)
+
+unempl2019 <- subset(unempl, Time<2019 & RATE=="U_RATE" & BIRTH=="NB" & GENDER=="TOT")
+unempl2007_2019 <- subset(unempl2019, Time>2007)
+
+minwage_unempl <-left_join(minwage2007_2019, unempl2007_2019, by=c("COUNTRY","Time"))
+
+complete_minwage_unempl <- na.omit(minwage_unempl)
+
+complete_minwage_unempl$MinWage_0 <-as.numeric(complete_minwage_unempl$ObsValue.x) 
+complete_minwage_unempl$UnEmpl <-as.numeric(complete_minwage_unempl$ObsValue.y)
+
+complete_minwage_unempl$MinWage <- complete_minwage_unempl$MinWage_0 * 100
+
+```
+
+Utfordring 3.1 2
+
+```{r echo=FALSE, fig.height=6, fig.width=6}
+minwage_plot <- ggplot(data=complete_minwage_unempl,aes(x=UnEmpl,y=MinWage, group=COUNTRY, color=COUNTRY)) + 
+  geom_line(aes(group=COUNTRY), size=1) +
+  geom_point(size=2.5)+
+  labs(title = "Arbeidsledighet vs. Minstelønn", x = "Arbeidsledighet i %" , y ="Minstelønn i %")  + 
+  theme(legend.position = "none", panel.background = element_rect(fill = "white", color = "white"))+
+  geom_label_repel(
+    data=complete_minwage_unempl %>% 
+      group_by(COUNTRY) %>% 
+      filter(UnEmpl==min(UnEmpl)),
+    aes(UnEmpl, MinWage, fill = COUNTRY, label = sprintf('%s', COUNTRY)),
+    color = "black",
+    fill = "white") 
+minwage_plot
+```
+
