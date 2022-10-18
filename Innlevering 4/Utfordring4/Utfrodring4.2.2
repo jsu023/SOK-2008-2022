@@ -1,0 +1,58 @@
+---
+title: "Utfordring4.2"
+author: "Justina Sumskyte"
+date: '2022-10-12'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = FALSE)
+
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(data.table)
+library(tidyverse)
+
+```
+
+```{r include=FALSE}
+
+women <- fread("~/Dev/SOK-2008-2022/Innlevering 4/women.csv")
+
+women$tot_full_rate<-as.numeric(women$tot_full_rate)
+women$fem_emp_rate_0_2<-as.numeric(women$fem_emp_rate_0_2)
+women$fem_emp_rate_6_14<-as.numeric(women$fem_emp_rate_6_14)
+
+```
+
+```{r pressure, echo=FALSE}
+kids_0_2 <- women %>%
+  ggplot(aes(x=tot_full_rate,y=fem_emp_rate_0_2))+
+  geom_point()+
+  ylim(0, 100)+
+  labs(x ="Uker med 100% støtte", y = "Yrkesdeltakelse blant mødre hvis yngste barn er 0-2 år")+
+  geom_smooth(method=lm, se=FALSE, color = "hotpink")+
+  theme(
+    panel.background = element_rect(fill = "seashell", color = "white"),
+    axis.title.y = element_text(size = 5),
+    axis.title.x = element_text(size = 5)
+  )
+
+kids_6_14 <- women %>%
+  ggplot(aes(x=tot_full_rate,y=fem_emp_rate_6_14))+
+  geom_point()+
+  ylim(0, 100)+
+  labs(x ="Uker med 100% støtte", y = "Yrkesdeltakelse blant mødre hvis yngste barn er 6-14 år")+
+  geom_smooth(method=lm, se=FALSE, color = "hotpink")+
+  theme(panel.background = element_rect(fill = "seashell", color = "white"),
+    axis.title.y = element_text(size = 5),
+    axis.title.x = element_text(size = 5)
+  )
+
+
+grid.arrange(kids_0_2,kids_6_14, nrow = 1,  top = textGrob("Sammenhengen mellom foreldrepermisjons lengde og mødres yrkesdelakelse etter yngste barns alder",gp=gpar(fontsize=5,font=4)))
+
+```
+
+

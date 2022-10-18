@@ -1,0 +1,115 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Utfording4},
+  pdfauthor={Justina Sumskyte},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Utfording4}
+\author{Justina Sumskyte}
+\date{2022-10-12}
+
+\begin{document}
+\maketitle
+
+\texttt{\{r\ setup,\ include=FALSE\}\ knitr::opts\_chunk\$set(include\ =\ FALSE)\ library(ggplot2)\ library(gridExtra)\ library(grid)\ library(data.table)\ library(tidyverse)}
+
+```\{r cars, include=FALSE\} women \textless-
+fread(``\textasciitilde/Dev/SOK-2008-2022/Innlevering 4/women.csv'')
+
+women\(tot_full_rate<-as.numeric(women\)tot\_full\_rate)
+women\(fem_emp_rate_0_2<-as.numeric(women\)fem\_emp\_rate\_0\_2)
+women\(fem_emp_rate_6_14<-as.numeric(women\)fem\_emp\_rate\_6\_14)
+
+\begin{verbatim}
+
+
+
+```{r pressure, echo=FALSE}
+kids_0_2 <- women %>%
+  ggplot(aes(x=tot_full_rate,y=fem_emp_rate_0_2))+
+  geom_point()+
+  ylim(0, 100)+
+  labs(x ="Uker med 100% støtte", y = "Yrkesdeltakelse blant mødre hvis yngste barn er 0-2 år")+
+  geom_smooth(method=lm, se=FALSE, color = "hotpink")+
+  theme(
+    panel.background = element_rect(fill = "seashell", color = "white"),
+    axis.title.y = element_text(size = 5),
+    axis.title.x = element_text(size = 5)
+  )
+
+kids_6_14 <- women %>%
+  ggplot(aes(x=tot_full_rate,y=fem_emp_rate_6_14))+
+  geom_point()+
+  ylim(0, 100)+
+  labs(x ="Uker med 100% støtte", y = "Yrkesdeltakelse blant mødre hvis yngste barn er 6-14 år")+
+  geom_smooth(method=lm, se=FALSE, color = "hotpink")+
+  theme(panel.background = element_rect(fill = "seashell", color = "white"),
+    axis.title.y = element_text(size = 5),
+    axis.title.x = element_text(size = 5)
+  )
+
+
+grid.arrange(kids_0_2,kids_6_14, nrow = 1,  top = textGrob("Sammenhengen mellom foreldrepermisjons lengde og mødres yrkesdelakelse etter yngste barns alder",gp=gpar(fontsize=5,font=4)))
+
+\end{verbatim}
+
+\end{document}
