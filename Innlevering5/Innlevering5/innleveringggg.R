@@ -1,0 +1,54 @@
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(PxWebApiData)
+
+landbakgrunn_for_innvand <- read_delim("landbakgrunn-for-innvand.csv", 
+  
+                                       
+                                                                            delim = ";", escape_double = FALSE, trim_ws = TRUE)
+landbak_1 <- landbakgrunn_for_innvand %>%
+  filter(År >= 2005) %>%
+  pivot_longer(!År, names_to = "country", values_to = "value")
+
+ggplot(landbak_1, aes(År , value, fill = country))+
+  geom_area()+
+  scale_y_continuous(labels = scales::comma)+
+  theme(panel.background = element_rect(fill = "white", color = "white"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())+
+  labs(fill = "Kontinent")
+
+
+data2 <- ApiData("https://data.ssb.no/api/v0/no/table/13215/", 
+                 Kjonn=list('item', c("0")), 
+                 Alder=list('item', c("15-74")), 
+                 InnvandrKat=list('item', c("B")), 
+                 Landbakgrunn=list('item', c("015a")), 
+                 NACE2007=list('agg:NACE260InnvGrupp2', c("SNI-00-99", "SNI-01-03", "SNI-05-09", "SNI-10-33", "SNI-35-39", "SNI-41-43", "SNI-45-47", "SNI-49-53", "SNI-49.3", "SNI-55", "SNI-56", "SNI-58-63", "SNI-64-66", "SNI-68-75", "SNI-77-82", "SNI-78.2", "SNI-81.2", "SNI-84", "SNI-85", "SNI-86-88", "SNI-90-99", "SNI-00")), 
+                 Tid=list('item', c("2021")), 
+                 ContentsCode=TRUE)
+
+data2 <- as_tibble(data2[[1]])
+
+data2 <- data2[-c(1),]
+
+
+data2 <- data2 %>%
+  rename("næring" = "næring (SN2007)")
+
+
+data2$næring <- gsub("[0-9.]","", data2$næring)
+
+ggplot(data2, aes(næring, value))+
+  geom_col()+
+  scale_y_continuous(labels = scales::comma)+
+  theme(panel.background = element_rect(fill = "white", color = "white"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust=0, size = 5, face = "bold"))+
+  scale_x_discrete(position = "top")
+
+
